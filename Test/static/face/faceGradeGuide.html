@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>人脸识别指导</title>
+    <script>
+        document.getElementsByTagName('html')[0].style.fontSize=document.documentElement.clientWidth/7.5+'px';
+    </script>
+    <link rel="stylesheet" href="./css/common.css">
+    <script src="https://cdn.bootcss.com/handlebars.js/4.0.10/handlebars.min.js"></script>
+    <script src="https://cdn.bootcss.com/iScroll/5.2.0/iscroll.min.js"></script>
+    <script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+    <script src="./js/common.js"></script>
+    <script src="./js/faceGradeGuide.js"></script>
+</head>
+<style>
+html,body{background-color: #000}
+.scroll{padding-left: .6rem;overflow: hidden;padding-bottom:1.8rem}
+h2{color: #fff;font-size: .44rem;margin-top: .56rem;margin-bottom: .85rem}
+.photo-wrap-1 h3,.photo-wrap-1 h4{font-weight: 500;color: #fff;font-size: .3rem;display: inline-block}
+.photo-wrap-1 h3{color: #fff;background-color:rgb(84, 0, 255);width: .38rem;line-height: .38rem;border-radius: 50%;margin:.38rem 0 .18rem;text-align: center}
+.photo-wrap-3{margin: .48rem 0 .8rem}
+.photo-wrap-3 li{float: left;height: 1.81rem;width: 1.72rem;background: url("./img/camera-guide.png")no-repeat center rgba(0, 0, 0,.65);background-size: contain;margin-left: .45rem}
+.submit-btn{margin-left: -1.25rem;width: 2.5rem}
+</style>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="scroll-wrapper">
+    <div class="scroll">
+        <h2>即将进入颜值鉴定 ^_^</h3>
+        <div class="photo-wrap-1">
+            <h3>1</h3>
+            <h4>确认您的脸部处于最佳状态</h4>
+            <ul class="photo-wrap-3 clearfix">
+                <li style="margin-left:1.15rem"></li>
+            </ul>
+        </div>
+        <div class="photo-wrap-1">
+            <h3>2</h3>
+            <h4>根据提示要求，拍摄三张照片</h4>
+            <ul class="photo-wrap-3 clearfix" style="margin-bottom:0">
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+    </div>
+
+    <li class="submit-btn">立即鉴颜</li>
+</body>
+</html>

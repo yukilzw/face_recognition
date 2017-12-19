@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>颜值鉴定</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <script src="https://cdn.bootcss.com/handlebars.js/4.0.10/handlebars.min.js"></script>
+    <script src="https://cdn.bootcss.com/iScroll/5.2.0/iscroll.min.js"></script>
+    <script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+    <script src="https://cdn.bootcss.com/exif-js/2.3.0/exif.min.js"></script>
+    <script src="./js/common.js"></script>
+    <script src="./js/faceGrade.js"></script>
+</head>
+<style>
+html,body{background-color: #fff}
+.scroll-wrapper{top:1.24rem;bottom: .5rem;z-index: 1}
+#photo-tip{color: #888888;font-size: .3rem;text-align: center;line-height: .5rem;margin-top: .24rem;position: absolute;top: 0;width: 100%}
+.photo-wrap-1{text-align: center}
+.photo-wrap-2{margin: 0 auto;width: 3.56rem;height: 4.03rem;border: 2px dashed #c5c5c5;border-radius: .1rem;box-sizing:content-box}
+.photo-content{margin: .2rem;height: 3.63rem;width:3.16rem;position: relative;background-image: url("./img/start-camera.png");background-position:center;background-color:#eaeaea;background-repeat: no-repeat;background-size: auto 1.47rem}
+.photo-content span{position: absolute;width: 100%;text-align: center;line-height: .58rem;color: #fff;background-color: rgba(0,0,0,.2);font-size: .3rem;font-weight: bold;bottom: 0;display: none}
+.photo-wrap-1 h3,.photo-wrap-1 h4{font-weight: 500;color: rgb(84, 0, 255);font-size: .3rem;display: inline-block}
+.photo-wrap-1 h3{color: #fff;background-color:rgb(84, 0, 255);width: .38rem;line-height: .38rem;border-radius: 50%;margin:.38rem 0 .18rem;text-align: center}
+input{display: none}
+
+#photo-big-wrap{z-index: 4;position: fixed;width: 100%;height: 100%;background-color: #000;top:0;display: none;background-position:center;background-repeat: no-repeat;background-size:cover}
+#photo-big-wrap>div{position: absolute;background-color: rgba(0,0,0,.6)}
+#img-point{position: relative;display: none}
+#left{width: .9rem;height: 100%;left: 0;top:0}
+#right{width: .9rem;height: 100%;right: 0;top:0}
+#top{height: 2.15rem;width: 5.7rem;left: .9rem;top:0}
+#bottom{height: 2.15rem;width: 5.7rem;left: .9rem;bottom: 0;text-align: center}
+#img{left: .9rem;right: .9rem;top:2.15rem;bottom: 2.15rem}
+#img i{position: absolute;width: .68rem;height: .68rem;display: block}
+#img i::before{content: "";position: absolute;width: .13rem;height: 100%;background-color: #fff;left: 0;top: 0}
+#img i::after{content: "";position: absolute;width: 100%;height: .13rem;background-color: #fff;left: 0;top: 0}
+#right-top{right: 0;top: 0;transform: rotate(90deg);-webkit-transform: rotate(90deg)}
+#right-bottom{right: 0;bottom: 0;transform: rotate(180deg);-webkit-transform: rotate(180deg)}
+#left-bottom{left: 0;bottom: 0;transform: rotate(270deg);-webkit-transform: rotate(270deg)}
+#delete{position: absolute;width: .7rem;height: .7rem;left: -.2rem;top: .36rem;;transform: scale(0.8);-webkit-transform:scale(0.8)}
+#delete::before{content: "";position: absolute;width:2px;height: .9rem;background-color: #fff;left: .35rem;top: -.1rem;transform: rotate(45deg);-webkit-transform: rotate(45deg)}
+#delete::after{content: "";position: absolute;width:2px;height: .9rem;background-color: #fff;left: .35rem;top: -.1rem;transform: rotate(-45deg);-webkit-transform: rotate(-45deg)}
+#success-title{position: absolute;width: 100%;text-align: center;font-size: .36rem;color: #fff;top: 1.2rem}
+#photo-yes{display: inline-block;font-size: .36rem;margin: .43rem auto 0;line-height: .78rem;padding: 0 .5rem;color: #fff;background-color: rgb(84, 0, 255);border-radius: .39rem}
+#photo-again{display: inline-block;font-size: .36rem;margin:.1rem auto 0;line-height: .78rem;padding: 0 .5rem;color: #fff;}
+.submit-btn{display: block;z-index:3;}
+.yyb-copyright{text-align: center;position: fixed;width: 100%;bottom: 0;color: #666;line-height: .4rem}
+#alert-content p{text-align: left;padding: 0 .5rem}
+
+.submit-btn {
+    text-transform: uppercase;
+    border-radius: .1rem;
+    line-height: .7rem;
+    width: 3rem;
+    margin-left: -1.5rem;
+    color: white;
+    border: 5px solid transparent;
+    border-bottom-color: rgba(0,0,0,0.35);
+    background: rgb(84, 0, 255);
+    cursor: pointer;
+    animation: pulse 1s infinite alternate;
+    -webkit-animation: pulse 1s infinite alternate;
+    transition: background-color 0.4s, border 0.2s;
+}
+.submit-btn:active {
+    border-bottom-width: 0;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);outline: none
+}
+@keyframes pulse {0% { bottom: 0.5rem;} 100% {bottom: 0.8rem;} }
+@-webkit-keyframes pulse {0% { bottom: 0.5rem;} 100% {bottom: 0.8rem;} }
+</style>
+<body>
+    <canvas id="c" style="opacity:.5"></canvas>
+
+    <input class="img-file" type="file" accept="image/*" capture="carema" data-index="0">
+    <input class="img-file" type="file" accept="image/*" capture="carema" data-index="1">
+    <input class="img-file" type="file" accept="image/*" capture="carema" data-index="2">
+
+    <p id="photo-tip">欢迎来到颜值比拼的世界，请按要求拍摄三张照片<br/><span class="color3">第一张正脸照将很大程度决定颜值评分</span></p>
+    <div class="scroll-wrapper">
+    <div class="scroll">
+        <ul>
+            <li>
+                <div class="photo-wrap-1">
+                    <h3>1</h3>
+                    <h4>第一张：请正姿面对拍摄</h4>
+                </div>
+                <div class="photo-wrap-2">
+                    <div class="photo-content" data-index="0">
+                        <span>重新拍摄</span>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="photo-wrap-1">
+                    <h3>2</h3>
+                    <h4>第二张：请张嘴拍摄</h4>
+                </div>
+                <div class="photo-wrap-2">
+                    <div class="photo-content" data-index="1">
+                        <span>重新拍摄</span>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="photo-wrap-1">
+                    <h3>3</h3>
+                    <h4>第三张：请面带笑容拍摄</h4>
+                </div>
+                <div class="photo-wrap-2">
+                    <div class="photo-content" data-index="2">
+                        <span>重新拍摄</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    </div>
+
+    <li class="submit-btn" id="button">颜值打分</li>
+    <p class="yyb-copyright">Powered by Yuki Liu 2017-12</p>
+
+    <div id="photo-big-wrap">
+        <canvas id="img-point"></canvas>
+        <div id="top">
+            <p id="success-title">提取照片成功</p>
+        </div>
+        <div id="right">
+            <span id="delete"></span>
+        </div>
+        <div id="bottom">
+            <span id="photo-yes">完成</span>
+            <br/>
+            <span id="photo-again">重新拍照</span>
+        </div>
+        <div id="left"></div>
+        <div id="img">
+            <i id="left-top"></i>
+            <i id="right-top"></i>
+            <i id="right-bottom"></i>
+            <i id="left-bottom"></i>
+        </div>
+    </div>
+
+    <script name="alert-template" type="text/x-handlebars-template">
+        <div id="alert-shade" type=
+            {{#if isAlert}}
+                "alert"
+            {{else}}
+                "confirm"
+            {{/if}}
+        >
+            <div id="alert">
+                <div id="alert-content">
+                    <h3>
+                        {{#if title}}
+                            {{title}}
+                        {{else}}
+                            提示
+                        {{/if}}
+                    </h3>
+                    <p>{{{content}}}</p>
+                </div>
+                <ul id="alert-choose" class="clearfix">
+                    <li id="alert-no">
+                        {{#if cancel}}
+                            {{cancel}}
+                        {{else}}
+                            取消
+                        {{/if}}
+                    </li>
+                    <li id="alert-yes">
+                        {{#if confirm}}
+                            {{confirm}}
+                        {{else}}
+                            确认
+                        {{/if}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </script>
+</body>
+</html>

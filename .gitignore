@@ -1,0 +1,3 @@
+__pycache__
+/Test/static/face/newface/*
+!/Test/static/face/newface/.gitkeep

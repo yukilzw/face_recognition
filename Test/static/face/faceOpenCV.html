@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no" />
+    <title>人脸识别</title>
+    <script>
+        document.getElementsByTagName('html')[0].style.fontSize=document.documentElement.clientWidth/7.5+'px';
+    </script>
+    <script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+    <script src="https://cdn.bootcss.com/exif-js/2.3.0/exif.min.js"></script>
+    <link rel="stylesheet" href="./css/common.css">
+    <script src="./js/faceOpenCV.js"></script>
+</head>
+<style>
+#pic-pos{overflow: hidden;;position: relative;height: 7rem;width: 7rem;margin: 1rem auto;border: 2px solid #eae;border-radius: .3rem;background-position: center;background-size: cover;transform:rotate(0deg) }
+#get-camera{text-align: center;line-height: 1rem;font-size: .5rem;margin: 0 auto;display: table;border: 2px solid #333;color: #333;border-radius: .2rem;padding: 0 .3rem}
+#progress{position: absolute;height: .3rem;width: 100%;background: #fff;left: 0;bottom: 0;}
+#progress b{width: 105%;display: block;height:100%;border-radius: 0 .15rem .15rem 0;background:linear-gradient(to right,rgb(2, 110, 20) 0%,rgb(191, 246, 184) 100%);transform: translate3d(-100%,0,0);}
+#progress b.load{transition:.5s}
+#shade{position: absolute;width: 100%;height: 100%;background-color: rgba(0,0,0,.5);top: 0;display: none;transition: .3s;opacity: 0}
+#shade-photo{width: 7.5rem;height: 7.5rem;background-size: contain;background-position: center;background-repeat: no-repeat}
+#wrap-1.blur{filter: blur(15px);-webkit-filter: blur(15px);transition: .3s}
+#photo-list{width: 7.5rem;overflow: auto;white-space: nowrap;padding: 0 .15rem}
+#photo-list li{height: 2rem;width: 2rem;margin:.2rem;margin-bottom: .3rem;display: inline-block;background-size: contain;background-position: center;background-repeat: no-repeat}
+</style>
+<body>
+    <div id="wrap-1">
+            <div id="pic-pos">
+                <div id="progress">
+                    <b></b>
+                </div>
+            </div>
+            <p id="get-camera">请点击拍照</p>
+            <input style="display: none" id="img-file" type="file" accept="image/*" capture="carema">
+    </div>
+
+    <div id="shade">
+        <div id="shade-photo"></div>
+        <ul id="photo-list">
+        
+        </ul>
+    </div>
+</body>
+</html>
+<script>
+window.onload=function(){
+    var URL = "http://liuzhanwei.tunnel.echomod.cn/",button=true;
+    $("#get-camera").on("click",function(){
+        if(button){
+            $("#img-file").click()
+        }
+    })
+    $('#img-file').on('change',function(){
+        button = false;
+        var file = this.files[0];
+        if(!file){
+            button = true;
+        }else if(file.type == "image/jpeg" || file.type == "image/png" || file.type == "image/gif"){
+            $("#get-camera").text("正在解析图片...");
+            var orientation;
+            //EXIF js 可以读取图片的元信息 https://github.com/exif-js/exif-js
+            EXIF.getData(file,function(){
+              orientation=EXIF.getTag(this,'Orientation');
+            });
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e){
+                getImgData(this.result,orientation,function(data){
+                    $("#progress b").removeClass("load").css("transform","translate3d(-100%,0,0)").css("outline")
+                    $('#pic-pos').css('background-image','url("'+data+'")')
+                    //$('#img-file')[0].imgData=data.split(',')[1]
+                    postImg(file)
+                }); 
+            }
+        }else{
+            /*$("#progress b").removeClass("load").css("transform","translate3d(-100%,0,0)").css("outline")
+            postImg(file)*/
+            alert("请上传图片文件")
+            button = true;
+        }
+    })
+    
+    //上传图片到服务器
+    function postImg(file){
+        var formData = new FormData()
+        formData.append("the_file",file)
+        $.ajax({
+    　　　　type: "POST",
+    　　　　url: URL + "savePhotoImg",
+    　　　　data: formData ,　　//这里上传的数据使用了formData 对象
+    　　　　processData : false, 
+    　　　　//必须false才会自动加上正确的Content-Type 
+    　　　　contentType : false , 
+    　　　　//这里我们先拿到jQuery产生的 XMLHttpRequest对象，为其增加 progress 事件绑定，然后再返回交给ajax使用
+    　　　　xhr: function(){
+    　　　　　　var xhr = $.ajaxSettings.xhr();
+    　　　　　　if(onprogress && xhr.upload) {
+                  $("#progress b").addClass("load")
+    　　　　　　　　xhr.upload.addEventListener("progress" , onprogress, false);
+    　　　　　　　　return xhr;
+    　　　　　　}
+    　　　　},
+            success:function(data){
+                if(data.status){
+                    var resImg = new Image()
+                    resImg.src = URL+data.path
+                    resImg.onload = function(){
+                        $("#photo-list li").remove()
+                        $("#shade-photo").css({"background-image":"url(\""+URL+data.path+"\")"})
+                        data.res_path.forEach(function(item,i){
+                            $('<li data-index="'+i+'"></li>').appendTo("#photo-list").css({"background-image":"url(\""+URL+item+"\")"})
+                        })
+                        resultShow()
+                        $("#photo-list li,#shade").on("click",function(){
+                            $("#shade").removeClass("active").css("opacity","0")
+                            $("#wrap-1").css("filter","blur(0)")
+                        })
+                        $("#shade").off("transitionend").on("transitionend",function(){
+                            if(!$(this).hasClass("active")){
+                                $(this).css("display","none")
+                            }
+                        })
+                        button=true
+                        $("#get-camera").text("请点击拍照");
+                    }
+                }else{
+                    button=true
+                    $("#get-camera").text("请点击拍照");
+                    alert(data.msg)
+                }
+            }
+    　　});
+    }
+    function onprogress(evt){
+    　　var loaded = evt.loaded;     //已经上传大小情况 
+        var tot = evt.total;      //附件总大小 
+        var per = Math.floor(100*loaded/tot);  //已经上传的百分比 
+        $("#progress b").css("transform","translate3d(-"+(100-per)+"%,0,0)")
+        $("#get-camera").text(per+"%");
+        if(per == 100){
+            $("#get-camera").text("服务器正在识别...");
+        }
+    }
+    function resultShow(){
+        $("#shade").css("display","block").addClass("active")
+        $("#shade").css("outline")
+        $("#shade").css("opacity","1")
+        $("#wrap-1").css("filter","blur(15px)")
+        $("#photo-list").scrollLeft(0)
+    }
+    $("#pic-pos").click(function(){
+        if($("#photo-list li").length && button)resultShow()
+    })
+    
+    // img 图片的base64
+    // dir exif获取的方向信息
+    // next 回调方法，返回校正方向后的base64
+    function getImgData(img,dir,next){
+    var image=new Image();
+    image.onload=function(){
+     var degree=0,drawWidth,drawHeight,width,height;
+     drawWidth=this.naturalWidth;
+     drawHeight=this.naturalHeight;
+     //以下改变一下图片大小
+     var maxSide = Math.max(drawWidth, drawHeight);
+     if (maxSide > 1024) {
+       var minSide = Math.min(drawWidth, drawHeight);
+       minSide = minSide / maxSide * 1024;
+       maxSide = 1024;
+       if (drawWidth > drawHeight) {
+         drawWidth = maxSide;
+         drawHeight = minSide;
+       } else {
+         drawWidth = minSide;
+         drawHeight = maxSide;
+       }
+     }
+     var canvas=document.createElement('canvas');
+     canvas.width=width=drawWidth;
+     canvas.height=height=drawHeight; 
+     var context=canvas.getContext('2d');
+     //判断图片方向，重置canvas大小，确定旋转角度，iphone默认的是home键在右方的横屏拍摄方式
+     switch(dir){
+       //iphone横屏拍摄，此时home键在左侧
+       case 3:
+         degree=180;
+         drawWidth=-width;
+         drawHeight=-height;
+         break;
+       //iphone竖屏拍摄，此时home键在下方(正常拿手机的方向)
+       case 6:
+         canvas.width=height;
+         canvas.height=width; 
+         degree=90;
+         drawWidth=width;
+         drawHeight=-height;
+         break;
+       //iphone竖屏拍摄，此时home键在上方
+       case 8:
+         canvas.width=height;
+         canvas.height=width; 
+         degree=270;
+         drawWidth=-width;
+         drawHeight=height;
+         break;
+     }
+     //使用canvas旋转校正
+     context.rotate(degree*Math.PI/180);
+     context.drawImage(this,0,0,drawWidth,drawHeight);
+     //返回校正图片
+     next(canvas.toDataURL("image/jpeg",.8));
+    }
+    image.src=img;
+    }
+}
+</script>
