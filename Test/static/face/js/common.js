@@ -115,6 +115,20 @@ function loading(){
 loading.remove=function(){
     $(".showbox").remove()
 }
+//json排序
+function JsonSort(json,key){
+    for(var j=1;j < json.length;j++){
+        var temp = json[j],
+            val  = temp[key],
+            i    = j-1;
+        while(i >=0 && json[i][key]>val){
+            json[i+1] = json[i];
+            i = i-1;
+        }
+        json[i+1] = temp;
+    }
+    return json;
+}
 ////// handlebars扩展块级helper //////
 Handlebars.registerHelper('compare', function(left, operator, right, options) {
     if (arguments.length < 3) {

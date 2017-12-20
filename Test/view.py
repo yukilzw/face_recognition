@@ -155,7 +155,7 @@ def binaryPipe(request):
             "api_key":"Myzf_TjfV1z0Wm3ld2sraH6VRpXMlTGJ",
             "api_secret" : "cWkQGRkTed14h8kWOrxA80cBEsFvY4Cv",
             "image_url":"http://liuzhanwei.tunnel.echomod.cn/py/static/face/newface/"+name,
-            "return_attributes": "gender,age,headpose,smiling,eyestatus,mouthstatus,beauty,facequality"
+            "return_attributes": "gender,age,headpose,smiling,eyestatus,mouthstatus,beauty,facequality,skinstatus,ethnicity,emotion"
         }
         if len(json.loads(request.POST["path"])) == 1:
             data["return_landmark"] = 1

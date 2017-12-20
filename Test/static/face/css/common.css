@@ -19,6 +19,7 @@ a,button{-webkit-tap-highlight-color:rgba(0,0,0,0);outline: none}
 #alert-yes{color: rgb(84, 0, 255);border-left: 1px solid #e6e6e6}
 #alert-shade[type=alert] #alert-no{display: none}
 #alert-shade[type=alert] #alert-yes{width: 100%;border-left: none}
+.color{color: rgb(84, 0, 255)}
 .color3{color: #ff4f48}
 /*submit*/
 .submit-btn{position: fixed;display: block;width: 5.8rem;line-height: .9rem;border-radius: .45rem;background-color: rgb(84, 0, 255);color: #fff;font-size: .36rem;text-align: center;left: 50%;bottom: .5rem;margin-left: -2.9rem}

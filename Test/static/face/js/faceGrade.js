@@ -127,11 +127,41 @@ window.onload=function() {
                     $(".submit-btn").text("提交鉴颜")
                     if(data.status){
                         if(data.result){
+                            var race = 0,emotion=new Array();
+                            switch(resArr[0].attributes.ethnicity.value){
+                                case "Asian":race = "亚洲人";break;
+                                case "White":race = "白人";break;
+                                case "Black":race = "黑人";break;
+                            }
+                            function getEmotionName(engName){
+                                switch(engName){
+                                    case "anger":return "愤怒";
+                                    case "disgust":return "厌恶";
+                                    case "fear":return "恐惧";
+                                    case "happiness":return "高兴";
+                                    case "neutral":return "平静";
+                                    case "sadness":return "伤心";
+                                    case "surprise":return "惊讶";
+                                }
+                            }
+                            for(k in resArr[0].attributes.emotion){
+                                emotion.push({
+                                    name:getEmotionName(k),
+                                    value:resArr[0].attributes.emotion[k]
+                                })
+                            }
+                            emotion = JsonSort(emotion,"value")
                             var res = "性别："+(resArr[0].attributes.gender.value == "Female" ? "女" : "男")+"<br/>"+
-                            "面部年龄："+parseInt(ageSum/3)+"<br/>"+
-                            "颜值评分："+(resArr[0].attributes.gender.value == "Female" ? resArr[0].attributes.beauty.female_score : resArr[0].attributes.beauty.male_score )+"<br/>"+
+                            "年龄："+parseInt(ageSum/3)+"<br/>"+
+                            "人种："+race+"<br/>"+
+                            "情绪："+emotion[emotion.length-1].name+"<br/>"+
+                            "色斑率："+resArr[0].attributes.skinstatus.stain+"%<br/>"+
+                            "青春痘："+resArr[0].attributes.skinstatus.acne+"%<br/>"+
+                            "黑眼圈："+resArr[0].attributes.skinstatus.dark_circle+"%<br/>"+
+                            "健康度："+resArr[0].attributes.skinstatus.health+"%<br/>"+
+                            "颜值评分：<span class='color'>"+(resArr[0].attributes.gender.value == "Female" ? resArr[0].attributes.beauty.female_score : resArr[0].attributes.beauty.male_score )+"</span><br/>"+
                             "<span class='color3'>使用美颜相机会影响识别结果</span>"
-                            myAlert({title:"分析结果",content:res})
+                            myAlert({title:"分析结果",confirm:"我服了",content:res})
                         }else{
                             myAlert({content:"三张人脸似乎不是一个人,请重新拍照！"})
                         }
