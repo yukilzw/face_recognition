@@ -8,6 +8,7 @@
     <script>
         document.getElementsByTagName('html')[0].style.fontSize=document.documentElement.clientWidth/7.5+'px';
     </script>
+    <script src="../config.js"></script>
     <script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
     <script src="https://cdn.bootcss.com/exif-js/2.3.0/exif.min.js"></script>
     <link rel="stylesheet" href="./css/common.css">
@@ -46,7 +47,7 @@
 </html>
 <script>
 window.onload=function(){
-    var URL = "http://liuzhanwei.tunnel.echomod.cn/",button=true;
+    var button=true;
     $("#get-camera").on("click",function(){
         if(button){
             $("#img-file").click()

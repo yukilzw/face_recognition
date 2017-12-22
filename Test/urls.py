@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^home$', view.home),
     url(r'^wxToken$', view.wxToken),
     url(r'^wx_JSSDK_check$', view.wx_JSSDK_check),
+    url(r'^wxOpenId$', view.wxOpenId),
+    url(r'^wxMsgPush$',view.wxMsgPush),
     url(r'^savePhotoImg$', view.savePhotoImg),
     url(r'^binaryPipe$', view.binaryPipe),
     url(r'favicon.ico',view.is404 )

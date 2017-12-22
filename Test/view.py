@@ -2,6 +2,7 @@ from django.http import HttpResponse,JsonResponse,HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from . import models
+import configparser
 import traceback
 import urllib
 import re
@@ -13,6 +14,17 @@ import threading
 import os
 import copy
 #from . import opencv
+
+#获取config配置文件
+def getConfig(section, key):
+    config = configparser.ConfigParser()
+    path = os.path.split(os.path.realpath(__file__))[0] + '/url.conf'
+    config.read(path)
+    return config.get(section, key)
+
+PUBLIC = {
+    "req_url" : getConfig("url","req_url")
+}
 
 #404返回
 is404 = lambda req: HttpResponse(404)
@@ -41,7 +53,7 @@ def pipe(request):
     response["Access-Control-Allow-Origin"] = request.META['HTTP_ORIGIN']   #设置允许源
     return response
 
-#动态主页
+#主页
 def home(request):
     sqlDate = {
         "id":uuid.uuid1().hex,
@@ -54,30 +66,6 @@ def home(request):
         "content":"心动音符丶",
     }
     return render(request, 'home.html',data)
-
-#微信测试号验证
-def wxToken(request):
-    response = HttpResponse(request.GET['echostr'])
-    return response
-
-#微信网页接口JS-SDK验证
-def wx_JSSDK_check(request):
-    url = request.GET['url']
-    nonceStr = uuid.uuid1().hex
-    timestamp = str(int(time.time()))
-    _str = 'jsapi_ticket='+wxCheck.ticket+ \
-           '&noncestr='+nonceStr+ \
-           '&timestamp='+timestamp+ \
-           '&url='+url
-    signature = hashlib.sha1(_str.encode("utf-8")).hexdigest()
-    res_dic = {
-        "appId":"wx73648417a7f020b2",
-        "nonceStr":nonceStr,
-        "timestamp":timestamp,
-        "signature":signature
-    }
-    response = JsonResponse(res_dic)
-    return response
 
 #获取access_token,jsapi_ticket类
 class getAssessToken(object):
@@ -103,6 +91,130 @@ class getAssessToken(object):
         self.ticket = res_data['ticket']
         print("获取的ticket为 ： "+self.ticket)
 wxCheck = getAssessToken()
+
+#微信测试号验证
+def wxToken(request):
+    response = HttpResponse(request.GET['echostr'])
+    return response
+
+#微信网页接口JS-SDK验证
+def wx_JSSDK_check(request):
+    url = request.GET['url']
+    nonceStr = uuid.uuid1().hex
+    timestamp = str(int(time.time()))
+    _str = 'jsapi_ticket='+wxCheck.ticket+ \
+           '&noncestr='+nonceStr+ \
+           '&timestamp='+timestamp+ \
+           '&url='+url
+    signature = hashlib.sha1(_str.encode("utf-8")).hexdigest()
+    res_dic = {
+        "appId":"wx73648417a7f020b2",
+        "nonceStr":nonceStr,
+        "timestamp":timestamp,
+        "signature":signature
+    }
+    response = JsonResponse(res_dic)
+    return response
+
+#获取微信openId,昵称,头像
+def wxOpenId(request):
+    url = request.GET['url']
+    code = request.GET['code']
+    if url:
+        data = {
+            "appid":"wx73648417a7f020b2",
+            "redirect_uri":url,
+            "response_type":"code",
+            "scope":"snsapi_userinfo",
+        }
+        urlencode = urllib.parse.urlencode(data)
+        res_dic = {
+            "status":True,
+            "codeUrl":"https://open.weixin.qq.com/connect/oauth2/authorize?"+urlencode+"#wechat_redirect",
+        }
+    elif code:
+        res_dic = {
+            "status":True
+        }
+        data = {
+            "appid":"wx73648417a7f020b2",
+            "secret":"99c1a2788f166198b991c688bc19bd8c",
+            "code":code,
+            "grant_type":"authorization_code",
+        }
+        urlencode = urllib.parse.urlencode(data)
+        req = urllib.request.Request("https://api.weixin.qq.com/sns/oauth2/access_token?"+urlencode)
+        res = urllib.request.urlopen(req)
+        res_data =  json.loads( res.read() )
+        res_dic["openid"] = res_data["openid"]
+        data = {
+            "access_token": res_data["access_token"],
+            "openid": res_data["openid"],
+            "lang": "zh_CN",
+        }
+        urlencode = urllib.parse.urlencode(data)
+        req = urllib.request.Request("https://api.weixin.qq.com/sns/userinfo?"+urlencode)
+        res = urllib.request.urlopen(req)
+        res_data =  json.loads( res.read() )
+        res_dic["nickname"] = res_data["nickname"]
+        res_dic["photoUrl"] = res_data["headimgurl"]
+    response = JsonResponse(res_dic)
+    response["Access-Control-Allow-Origin"] = request.META['HTTP_HOST']
+    return response
+
+#微信推送人脸识别消息
+@csrf_exempt
+def wxMsgPush(request):
+    dic = {
+        "touser":request.POST["openId"],
+        "template_id":"lkhk2WF1npyi9_TOmFfqS--2J4CbSaY6lAsc8yHGOO0",
+        "topcolor":"#FF0000",
+        "data":{
+            "sex":{
+                "value":request.POST["sex"],
+                "color":"#333333"
+            },
+            "age":{
+                "value":request.POST["age"],
+                "color":"#333333"
+            },
+            "race":{
+                "value":request.POST["race"],
+                "color":"#333333"
+            },
+            "emotion":{
+                "value":request.POST["emotion"],
+                "color":"#333333"
+            },
+            "stain":{
+                "value":request.POST["stain"],
+                "color":"#333333"
+            },
+            "acne":{
+                "value":request.POST["acne"],
+                "color":"#333333"
+            },
+            "dark_circle":{
+                "value":request.POST["dark_circle"],
+                "color":"#333333"
+            },
+            "health":{
+                "value":request.POST["health"],
+                "color":"#333333"
+            },
+            "grade":{
+                "value":request.POST["grade"],
+                "color":"#5400FF"
+            },
+        }
+    }
+    data = re.sub(r'\'', "\"",str(dic)).encode("utf-8")
+    req = urllib.request.Request("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+wxCheck.assess_token,data)
+    res = urllib.request.urlopen(req)
+    res_data = json.loads(res.read())
+    response = JsonResponse(res_data)
+    response["Access-Control-Allow-Origin"] = request.META['HTTP_HOST']
+    return response
 
 #opencv人脸识别
 @csrf_exempt
@@ -154,7 +266,7 @@ def binaryPipe(request):
         data = {
             "api_key":"Myzf_TjfV1z0Wm3ld2sraH6VRpXMlTGJ",
             "api_secret" : "cWkQGRkTed14h8kWOrxA80cBEsFvY4Cv",
-            "image_url":"http://liuzhanwei.tunnel.echomod.cn/py/static/face/newface/"+name,
+            "image_url":PUBLIC["req_url"]+"py/static/face/newface/"+name,
             "return_attributes": "gender,age,headpose,smiling,eyestatus,mouthstatus,beauty,facequality,skinstatus,ethnicity,emotion"
         }
         if len(json.loads(request.POST["path"])) == 1:
@@ -181,8 +293,8 @@ def binaryPipe(request):
             data = {
                 "api_key":"Myzf_TjfV1z0Wm3ld2sraH6VRpXMlTGJ",
                 "api_secret" : "cWkQGRkTed14h8kWOrxA80cBEsFvY4Cv",
-                "image_url1":"http://liuzhanwei.tunnel.echomod.cn/"+img1,
-                "image_url2":"http://liuzhanwei.tunnel.echomod.cn/"+img2,
+                "image_url1":PUBLIC["req_url"]+img1,
+                "image_url2":PUBLIC["req_url"]+img2,
             }
             data = urllib.parse.urlencode(data).encode("utf-8")
             req = urllib.request.Request("https://api-cn.faceplusplus.com/facepp/v3/compare", data)

@@ -1,9 +1,9 @@
 window.onload=function(){
-    console.log(89)
     initTemplate([],tempCallBack)
     //模板异步加载完成回调
     function tempCallBack(){
         $(".submit-btn").on("click",function(){
+            if(!sessionStorage.getItem("openid") && ENV == "wx")return;
             window.location.href = "./faceGrade.html"
         })
     }

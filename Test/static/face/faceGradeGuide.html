@@ -7,6 +7,7 @@
     <script>
         document.getElementsByTagName('html')[0].style.fontSize=document.documentElement.clientWidth/7.5+'px';
     </script>
+    <script src="../config.js"></script>
     <link rel="stylesheet" href="./css/common.css">
     <script src="https://cdn.bootcss.com/handlebars.js/4.0.10/handlebars.min.js"></script>
     <script src="https://cdn.bootcss.com/iScroll/5.2.0/iscroll.min.js"></script>
@@ -28,12 +29,12 @@ h2{color: #fff;font-size: .44rem;margin-top: .56rem;margin-bottom: .85rem}
     <canvas id="canvas"></canvas>
     <div class="scroll-wrapper">
     <div class="scroll">
-        <h2>即将进入颜值鉴定 ^_^</h3>
+        <h2><span class="wx-name"></span>即将进入颜值鉴定 ^_^</h3>
         <div class="photo-wrap-1">
             <h3>1</h3>
             <h4>确认您的脸部处于最佳状态</h4>
             <ul class="photo-wrap-3 clearfix">
-                <li style="margin-left:1.15rem"></li>
+                <li class="wx-photo" style="margin-left:1.15rem"></li>
             </ul>
         </div>
         <div class="photo-wrap-1">

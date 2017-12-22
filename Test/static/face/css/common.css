@@ -16,7 +16,7 @@ a,button{-webkit-tap-highlight-color:rgba(0,0,0,0);outline: none}
 #alert-content h3{text-align: center;font-size: .34rem}
 #alert-content p{font-size: .3rem;margin: .3rem .2rem 0;text-align: center;line-height: 1.4;word-wrap: break-word}
 #alert-choose li{float: left;width: 50%;text-align: center;line-height: .9rem;border-top: 1px solid #e6e6e6;font-size: .32rem}
-#alert-yes{color: rgb(84, 0, 255);border-left: 1px solid #e6e6e6}
+#alert-yes{color: #5400ff;border-left: 1px solid #e6e6e6}
 #alert-shade[type=alert] #alert-no{display: none}
 #alert-shade[type=alert] #alert-yes{width: 100%;border-left: none}
 .color{color: rgb(84, 0, 255)}

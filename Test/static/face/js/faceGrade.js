@@ -1,7 +1,6 @@
 window.onload=function() {
     initTemplate([],tempCallBack)
-    var URL = "http://liuzhanwei.tunnel.echomod.cn/",
-        buttonArr = [0,0,0],    //图片是否选取
+    var buttonArr = [0,0,0],    //图片是否选取
         picArr = [null,null,null],  //图片文件数据
         resArr=[null,null,null];    //图片识别结果
     //模板异步加载完成回调
@@ -151,17 +150,29 @@ window.onload=function() {
                                 })
                             }
                             emotion = JsonSort(emotion,"value")
-                            var res = "性别："+(resArr[0].attributes.gender.value == "Female" ? "女" : "男")+"<br/>"+
-                            "年龄："+parseInt(ageSum/3)+"<br/>"+
+                            var sex = resArr[0].attributes.gender.value == "Female" ? "女" : "男",
+                                age = parseInt(ageSum/3),
+                                emotion = emotion[emotion.length-1].name,
+                                stain = resArr[0].attributes.skinstatus.stain+"%",
+                                acne = resArr[0].attributes.skinstatus.acne+"%",
+                                dark_circle = resArr[0].attributes.skinstatus.dark_circle+"%",
+                                health = resArr[0].attributes.skinstatus.health+"%",
+                                grade = resArr[0].attributes.gender.value == "Female" ? resArr[0].attributes.beauty.female_score : resArr[0].attributes.beauty.male_score,
+                            res = 
+                            "性别："+sex+"<br/>"+
+                            "年龄："+age+"<br/>"+
                             "人种："+race+"<br/>"+
-                            "情绪："+emotion[emotion.length-1].name+"<br/>"+
-                            "色斑率："+resArr[0].attributes.skinstatus.stain+"%<br/>"+
-                            "青春痘："+resArr[0].attributes.skinstatus.acne+"%<br/>"+
-                            "黑眼圈："+resArr[0].attributes.skinstatus.dark_circle+"%<br/>"+
-                            "健康度："+resArr[0].attributes.skinstatus.health+"%<br/>"+
-                            "颜值评分：<span class='color'>"+(resArr[0].attributes.gender.value == "Female" ? resArr[0].attributes.beauty.female_score : resArr[0].attributes.beauty.male_score )+"</span><br/>"+
+                            "情绪："+emotion+"<br/>"+
+                            "色斑率："+stain+"<br/>"+
+                            "青春痘："+acne+"<br/>"+
+                            "黑眼圈："+dark_circle+"<br/>"+
+                            "健康度："+health+"<br/>"+
+                            "颜值评分：<span class='color'>"+grade+"</span><br/>"+
                             "<span class='color3'>使用美颜相机会影响识别结果</span>"
                             myAlert({title:"分析结果",confirm:"我服了",content:res})
+                            if(sessionStorage.getItem("openid")){
+                                wxMsgPush(sex,age,race,emotion,stain,acne,dark_circle,health,grade)
+                            }
                         }else{
                             myAlert({content:"三张人脸似乎不是一个人,请重新拍照！"})
                         }
@@ -170,6 +181,25 @@ window.onload=function() {
                     }
                 }
             })
+        })
+    }
+    //微信消息推送
+    function wxMsgPush(sex,age,race,emotion,stain,acne,dark_circle,health,grade){
+        $.ajax({
+    　　　　type: "POST",
+    　　　　url:URL + "wxMsgPush",
+            data:{
+                openId:sessionStorage.getItem("openid"),
+                sex:sex,
+                age:age,
+                race:race,
+                emotion:emotion,
+                stain:stain,
+                acne:acne,
+                dark_circle:dark_circle,
+                health:health,
+                grade:grade
+            }
         })
     }
     //创建二进制对象

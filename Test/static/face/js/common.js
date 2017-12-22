@@ -1,4 +1,5 @@
-var REM = document.documentElement.clientWidth/7.5
+var REM = document.documentElement.clientWidth/7.5,
+ENV = "normal"
 document.getElementsByTagName('html')[0].style.fontSize = REM+'px';
 
 //异步初始全部完成回调
@@ -11,6 +12,11 @@ function asyncHasInit(){
 }
 
 $(function(){
+    var ua = window.navigator.userAgent.toLowerCase();
+    if(/micromessenger/i.test(ua)){
+        ENV = "wx"
+        getOpenId()
+    }
     document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
     if(document.getElementsByClassName('scroll-wrapper').length){
         $.iscroll = new IScroll('.scroll-wrapper',{click:true,preventDefault:false})
@@ -25,6 +31,41 @@ $(function(){
         isPageHide = true;  
     });
 })
+
+function getOpenId(){
+    if(sessionStorage.getItem("openid")){
+        $(".wx-name").text(sessionStorage.getItem("nickname")+"，")
+        $(".wx-photo").css({
+            "background-size":"cover",
+            "background-image":"url("+sessionStorage.getItem("photoUrl")+")"
+        })
+        return;
+    }
+    var ob=parseUrl(window.location.href);
+    var code=ob.code;
+    $.ajax({
+        url: URL+ "wxOpenId",
+        type:"get",
+        data:{
+            code:code ? code : '',
+            url:code ? '' :  encodeURIComponent(window.location.href)
+        },
+        success:function(data){
+            if(!code){
+                window.location.href = decodeURIComponent(data.codeUrl);
+            }else{
+                sessionStorage.setItem("openid",data.openid)
+                sessionStorage.setItem("nickname",data.nickname)
+                sessionStorage.setItem("photoUrl",data.photoUrl)
+                $(".wx-name").text(sessionStorage.getItem("nickname")+"，")
+                $(".wx-photo").css({
+                    "background-size":"cover",
+                    "background-image":"url("+sessionStorage.getItem("photoUrl")+")"
+                })
+            }
+        }
+    })
+}
 
 //选项卡
 function chooseAct(el,fn){
