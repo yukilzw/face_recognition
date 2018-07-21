@@ -14,11 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from . import view
+from .fun import view,mock
 
-urlpatterns = [
-    url(r'^szftzyy|szetyy', view.pipe),
+viewPath = [
+    url(r'^pipe', view.pipe),
     url(r'^home$', view.home),
+    url(r'^vue-app', view.vueDemo),
     url(r'^wxToken$', view.wxToken),
     url(r'^wx_JSSDK_check$', view.wx_JSSDK_check),
     url(r'^wxOpenId$', view.wxOpenId),
@@ -27,3 +28,9 @@ urlpatterns = [
     url(r'^binaryPipe$', view.binaryPipe),
     url(r'favicon.ico',view.is404 )
 ]
+
+mockPath = [
+    url(r'^H5/Outdoorsrank', mock.activityConfig)
+]
+
+urlpatterns = viewPath + mockPath

@@ -112,7 +112,7 @@ window.onload=function() {
             }
             $.ajax({
         　　　　 type: "POST",
-        　　　　 url:URL + "binaryPipe",
+        　　　　 url:_URL + "binaryPipe",
                 data:{
                     reqType:"compare",
                     path:path
@@ -187,7 +187,7 @@ window.onload=function() {
     function wxMsgPush(sex,age,race,emotion,stain,acne,dark_circle,health,grade){
         $.ajax({
     　　　　type: "POST",
-    　　　　url:URL + "wxMsgPush",
+    　　　　url:_URL + "wxMsgPush",
             data:{
                 openId:sessionStorage.getItem("openid"),
                 sex:sex,
@@ -223,7 +223,7 @@ window.onload=function() {
         formData.append("path",[])
         $.ajax({
     　　　　type: "POST",
-    　　　　url:URL + "binaryPipe",
+    　　　　url:_URL + "binaryPipe",
            beforeSend:function(){
                 loading()
             },
@@ -237,7 +237,7 @@ window.onload=function() {
                     var picUrl = data.path[0]
                     $.ajax({
                 　　　　type: "POST",
-                　　　　url:URL + "binaryPipe",
+                　　　　url:_URL + "binaryPipe",
                         data:{
                             reqType:"recognition",
                             path:data.path

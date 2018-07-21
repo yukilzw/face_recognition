@@ -16,8 +16,33 @@ buttonJson = {
         {    
             "type":"view",
             "name":"颜值打分",
-            "url":PUBLIC["req_url"] + "py/static/face/faceGradeGuide.html",
-        }
+            "url":"http://liuzhanwei.tunnel.echomod.cn/py/static/face/faceGradeGuide.html",
+        },
+        {
+            "name":"医疗项目",
+            "sub_button":[
+                {    
+                    "type":"view",
+                    "name":"院内服务",
+                    "url":"http://liuzhanwei2.tunnel.echomod.cn/yybdemo",
+                },
+                {    
+                    "type":"view",
+                    "name":"Vue预约挂号",
+                    "url":"http://liuzhanwei2.tunnel.echomod.cn/vue-app",
+                },
+                {    
+                    "type":"view",
+                    "name":"ng5在线问诊",
+                    "url":"http://liuzhanwei2.tunnel.echomod.cn/code/js-frame/askDoctor/dist",
+                },
+                {    
+                    "type":"view",
+                    "name":"聊天测试",
+                    "url":"http://liuzhanwei.tunnel.echomod.cn/py/static/code/html/live/chat.html",
+                },
+            ]
+        },
     ]
 }
 

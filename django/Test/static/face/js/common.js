@@ -44,7 +44,7 @@ function getOpenId(){
     var ob=parseUrl(window.location.href);
     var code=ob.code;
     $.ajax({
-        url: URL+ "wxOpenId",
+        url: _URL+ "wxOpenId",
         type:"get",
         data:{
             code:code ? code : '',

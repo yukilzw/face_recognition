@@ -89,7 +89,7 @@ window.onload=function(){
         formData.append("the_file",file)
         $.ajax({
     　　　　type: "POST",
-    　　　　url: URL + "savePhotoImg",
+    　　　　url: _URL + "savePhotoImg",
     　　　　data: formData ,　　//这里上传的数据使用了formData 对象
     　　　　processData : false, 
     　　　　//必须false才会自动加上正确的Content-Type 
@@ -106,10 +106,10 @@ window.onload=function(){
             success:function(data){
                 if(data.status){
                     var resImg = new Image()
-                    resImg.src = URL+data.path
+                    resImg.src = _URL+data.path
                     resImg.onload = function(){
                         $("#photo-list li").remove()
-                        $("#shade-photo").css({"background-image":"url(\""+URL+data.path+"\")"})
+                        $("#shade-photo").css({"background-image":"url(\""+_URL+data.path+"\")"})
                         data.res_path.forEach(function(item,i){
                             $('<li data-index="'+i+'"></li>').appendTo("#photo-list").css({"background-image":"url(\""+URL+item+"\")"})
                         })

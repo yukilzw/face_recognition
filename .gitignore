@@ -1,5 +1,3 @@
 __pycache__
-/Test/url.conf
-/Test/static/config.js
-/Test/static/face/newface/*
-!/Test/static/face/newface/.gitkeep
+/django/Test/static/face/newface/*
+!/django/Test/static/face/newface/.gitkeep

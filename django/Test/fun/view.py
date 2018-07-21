@@ -1,7 +1,7 @@
 from django.http import HttpResponse,JsonResponse,HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from . import models
+from .. import models
 import configparser
 import traceback
 import urllib
@@ -13,6 +13,7 @@ import hashlib
 import threading
 import os
 import copy
+from . import wxToken
 #from . import opencv
 
 #获取config配置文件
@@ -26,16 +27,18 @@ PUBLIC = {
     "req_url" : getConfig("url","req_url")
 }
 
+#获取微信assess_token,jsapi_ticket
+if PUBLIC["req_url"] == "http://liuzhanwei.tunnel.echomod.cn/":
+    wxCheck = wxToken.getAssessToken()
+
 #404返回
 is404 = lambda req: HttpResponse(404)
 
 #请求转发
 @csrf_exempt
 def pipe(request):
-    if re.search(r'szftzyy',request.path,re.M|re.I):
-        url = "http://ftzyy.haoli13.net" + request.path
-    elif re.search(r'szetyy',request.path,re.M|re.I):
-        url = "http://112.2.18.62:8500" + request.path
+    if re.search(r'pipe',request.path,re.M|re.I):
+        url = "http://localhost:1234" + request.path
     reqHeaders = {}    #转发请求头
     for k,val in request.META.items():
         if re.search(r'^content', k, re.M|re.I) or re.search(r'^http', k, re.M|re.I):
@@ -55,43 +58,27 @@ def pipe(request):
 
 #主页
 def home(request):
+    '''
     sqlDate = {
         "id":uuid.uuid1().hex,
         "name": "刘占威",
         "tel": 13871519390
     }
     obj = models.Company.objects.create(**sqlDate)
+    '''
     data = {
         "title":"个人主页|刘占威",
         "content":"心动音符丶",
     }
     return render(request, 'home.html',data)
 
-#获取access_token,jsapi_ticket类
-class getAssessToken(object):
-    def __init__(self):
-        try:
-            self.assess_token
-            timer = threading.Timer(1.99*60*60, self.getToken)
-            timer.start()
-        except AttributeError:
-            self.getToken()
-    def getToken(self):
-        req = urllib.request.Request("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx73648417a7f020b2&secret=99c1a2788f166198b991c688bc19bd8c")
-        res = urllib.request.urlopen(req)
-        res_data =  json.loads(res.read())
-        self.assess_token = res_data['access_token']
-        print("获取的token为 ： "+self.assess_token)
-        self.getTicket()
-        self.__init__()
-    def getTicket(self):
-        req = urllib.request.Request('https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token='+self.assess_token+'&type=jsapi')
-        res = urllib.request.urlopen(req)
-        res_data =  json.loads(res.read())
-        self.ticket = res_data['ticket']
-        print("获取的ticket为 ： "+self.ticket)
-wxCheck = getAssessToken()
-
+#vue spa demo
+def vueDemo(request):
+    files = os.path.join("../../js-frame/by-vue/client-dist/index.html")
+    with open(files,mode='r', encoding='UTF-8') as f:
+        response = HttpResponse(f.read())
+    return response   
+    
 #微信测试号验证
 def wxToken(request):
     response = HttpResponse(request.GET['echostr'])
