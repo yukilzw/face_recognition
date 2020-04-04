@@ -1,5 +1,5 @@
-#### 这是一个恐怖游戏...
-
+### 这是一个恐怖游戏...
+- - -
 <div>
 <img src="http://r.photo.store.qq.com/psc?/V14dALyK4PrHuj/WntOtr8rW56pbv0uxxE6dTpVILOh5mhPvXtVk68px3PoOFpDecUqeKLOrv4kgFojg7lkvob1hcPdhflcUkxxHOCmt2FUrRXfJgY3KmVuM4A!/r" width="40%"/>
 <img src="http://r.photo.store.qq.com/psc?/V14dALyK4PrHuj/WntOtr8rW56pbv0uxxE6dU31W.*QWvXuUiWqQfDrRrXfrx.22aQkLY*SufEVGfxmVR5S8VN4NjAkhK2shVPveJ8XFXyvFIXJa47j2BvKXqc!/r" width="40%"/>
