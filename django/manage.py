@@ -17,4 +17,4 @@ if __name__ == "__main__":
                 "Couldn't import Django ."
             )
         raise
-    execute_from_command_line([os.path.abspath(__file__),"runserver","0.0.0.0:1235","--noreload"])
+    execute_from_command_line([os.path.abspath(__file__),"runserver","0.0.0.0:1236","--noreload"])

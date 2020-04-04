@@ -243,13 +243,14 @@ def binaryPipe(request):
         md5 = hashlib.md5()
         md5.update( (request.POST[picName] + str(img.size)).encode() )
         name = md5.hexdigest() + "." + request.POST[picName].split(".")[-1]
-        img_path = os.path.join('./Test/static/face/newface/',name)
+        img_path = os.path.join('D:/code/face_recognition/django/Test/static/face/newface/',name)
         if not os.path.exists(img_path):
             with open(img_path,'wb') as f:
                 for chunk in img.chunks():
                     f.write(chunk)
         stat['path'].append('py/static/face/newface/' + name)
     def recognition(name):
+        print(name)
         data = {
             "api_key":"Myzf_TjfV1z0Wm3ld2sraH6VRpXMlTGJ",
             "api_secret" : "cWkQGRkTed14h8kWOrxA80cBEsFvY4Cv",
@@ -278,8 +279,8 @@ def binaryPipe(request):
             if not isSameFace[0]:
                 return
             data = {
-                "api_key":"Myzf_TjfV1z0Wm3ld2sraH6VRpXMlTGJ",
-                "api_secret" : "cWkQGRkTed14h8kWOrxA80cBEsFvY4Cv",
+                "api_key":"URfNyeX92SjKaCzUMIv6GfoktA2ZM0B3",
+                "api_secret" : "48YhShAHBPlQPbp0yKOHQhfGpbbUsrii",
                 "image_url1":PUBLIC["req_url"]+img1,
                 "image_url2":PUBLIC["req_url"]+img2,
             }

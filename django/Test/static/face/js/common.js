@@ -1,5 +1,6 @@
 var REM = document.documentElement.clientWidth/7.5,
 ENV = "normal"
+_URL = "http://yukilzw.free.idcfengye.com/"
 document.getElementsByTagName('html')[0].style.fontSize = REM+'px';
 
 //异步初始全部完成回调
